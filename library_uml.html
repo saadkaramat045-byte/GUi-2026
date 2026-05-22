@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library Management System — UML Class Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --card: #141c2e;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --header-bg: #1e3a5f;
+    --attr-bg: #0f172a;
+    --method-bg: #0c1628;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 16px;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(0,212,255,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(124,58,237,0.05) 0%, transparent 50%);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: 800;
+    text-align: center;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: 28px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ── UML Class Box ── */
+  .uml-class {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,255,0.05);
+    transition: box-shadow 0.2s;
+  }
+  .uml-class:hover {
+    box-shadow: 0 8px 32px rgba(0,212,255,0.12), 0 0 0 1px rgba(0,212,255,0.2);
+  }
+
+  .class-header {
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .class-stereotype {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    opacity: 0.8;
+  }
+  .class-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .class-section {
+    border-top: 1px solid var(--border);
+    padding: 8px 14px;
+  }
+  .class-section-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .attr, .method {
+    font-size: 11px;
+    padding: 3px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    line-height: 1.5;
+  }
+  .visibility {
+    font-weight: 700;
+    width: 12px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+  .vis-pub { color: var(--accent3); }
+  .vis-prv { color: #ef4444; }
+  .vis-pro { color: var(--accent4); }
+
+  .attr-name { color: var(--text); }
+  .attr-type { color: var(--accent); opacity: 0.7; font-size: 10px; }
+  .method-name { color: var(--accent4); }
+  .method-params { color: var(--muted); font-size: 10px; }
+  .method-return { color: var(--accent3); font-size: 10px; margin-left: auto; }
+
+  /* ── Color themes per class ── */
+  .cls-book .class-header { background: linear-gradient(135deg, #1e3a5f, #1a2a4a); border-bottom: 2px solid var(--accent); }
+  .cls-member .class-header { background: linear-gradient(135deg, #2d1b4e, #1e1035); border-bottom: 2px solid var(--accent2); }
+  .cls-member .class-stereotype, .cls-member .class-name { color: #a78bfa; }
+  .cls-loan .class-header { background: linear-gradient(135deg, #1a3a2a, #0f2a1a); border-bottom: 2px solid var(--accent3); }
+  .cls-loan .class-stereotype, .cls-loan .class-name { color: #6ee7b7; }
+  .cls-librarian .class-header { background: linear-gradient(135deg, #3a2a10, #2a1a08); border-bottom: 2px solid var(--accent4); }
+  .cls-librarian .class-stereotype, .cls-librarian .class-name { color: #fcd34d; }
+  .cls-catalog .class-header { background: linear-gradient(135deg, #1e1a3a, #12102a); border-bottom: 2px solid #f472b6; }
+  .cls-catalog .class-stereotype, .cls-catalog .class-name { color: #f9a8d4; }
+  .cls-db .class-header { background: linear-gradient(135deg, #1a1a1a, #111); border-bottom: 2px solid #6b7280; }
+  .cls-db .class-stereotype, .cls-db .class-name { color: #9ca3af; }
+
+  /* ── Relationships ── */
+  .relationships {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .rel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+  .rel-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+  .rel-item:last-child { border-bottom: none; }
+  .rel-from { color: #fff; font-weight: 600; }
+  .rel-arrow { color: var(--accent); font-size: 14px; }
+  .rel-to { color: #fff; font-weight: 600; }
+  .rel-type { 
+    margin-left: auto;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .rt-assoc { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .rt-comp  { background: rgba(16,185,129,0.1); color: var(--accent3); border: 1px solid rgba(16,185,129,0.3); }
+  .rt-dep   { background: rgba(245,158,11,0.1); color: var(--accent4); border: 1px solid rgba(245,158,11,0.3); }
+  .rt-agg   { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+
+  .rel-label { color: var(--muted); font-size: 10px; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .legend-sym { font-weight: 700; font-size: 12px; }
+
+  /* ── Grid for classes ── */
+  .classes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 600px) {
+    .classes-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>📚 Library Management System</h1>
+<p class="subtitle">UML Class Diagram · SEC6402 OEL · Python + Tkinter + MySQL</p>
+
+<div class="diagram">
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-sym vis-pub">+</span> Public</div>
+    <div class="legend-item"><span class="legend-sym vis-prv">-</span> Private</div>
+    <div class="legend-item"><span class="legend-sym vis-pro">#</span> Protected</div>
+    <div class="legend-item" style="color:#aaa">| Attributes | Methods |</div>
+  </div>
+
+  <!-- CLASSES GRID -->
+  <div class="classes-grid">
+
+    <!-- Book -->
+    <div class="uml-class cls-book">
+      <div class="class-header">
+        <span class="class-stereotype">«entity»</span>
+        <span class="class-name">Book</span>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Attributes</div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">book_id</span><span class="attr-type">: int</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">title</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">author</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">isbn</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">category</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">quantity</span><span class="attr-type">: int</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">available</span><span class="attr-type">: bool</span></div>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Methods</div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">get_details()</span><span class="method-return">: dict</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">update_availability()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">search(keyword)</span><span class="method-return">: Book</span></div>
+      </div>
+    </div>
+
+    <!-- Member -->
+    <div class="uml-class cls-member">
+      <div class="class-header">
+        <span class="class-stereotype">«entity»</span>
+        <span class="class-name">Member</span>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Attributes</div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">member_id</span><span class="attr-type">: int</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">name</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">email</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">phone</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">join_date</span><span class="attr-type">: date</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">active_loans</span><span class="attr-type">: int</span></div>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Methods</div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">register()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">get_loan_history()</span><span class="method-return">: list</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">update_info()</span><span class="method-return">: void</span></div>
+      </div>
+    </div>
+
+    <!-- Loan -->
+    <div class="uml-class cls-loan">
+      <div class="class-header">
+        <span class="class-stereotype">«entity»</span>
+        <span class="class-name">Loan</span>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Attributes</div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">loan_id</span><span class="attr-type">: int</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">book_id</span><span class="attr-type">: int</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">member_id</span><span class="attr-type">: int</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">issue_date</span><span class="attr-type">: date</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">due_date</span><span class="attr-type">: date</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">return_date</span><span class="attr-type">: date</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">fine</span><span class="attr-type">: float</span></div>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Methods</div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">issue_book()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">return_book()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">calculate_fine()</span><span class="method-return">: float</span></div>
+      </div>
+    </div>
+
+    <!-- Librarian -->
+    <div class="uml-class cls-librarian">
+      <div class="class-header">
+        <span class="class-stereotype">«entity»</span>
+        <span class="class-name">Librarian</span>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Attributes</div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">librarian_id</span><span class="attr-type">: int</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">username</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">password_hash</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">role</span><span class="attr-type">: str</span></div>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Methods</div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">login()</span><span class="method-return">: bool</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">add_book()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">remove_book()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">generate_report()</span><span class="method-return">: void</span></div>
+      </div>
+    </div>
+
+    <!-- Catalog -->
+    <div class="uml-class cls-catalog">
+      <div class="class-header">
+        <span class="class-stereotype">«service»</span>
+        <span class="class-name">Catalog</span>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Attributes</div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">books</span><span class="attr-type">: List[Book]</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">total_books</span><span class="attr-type">: int</span></div>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Methods</div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">search_by_title()</span><span class="method-return">: list</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">search_by_author()</span><span class="method-return">: list</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">list_all_books()</span><span class="method-return">: list</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">filter_by_category()</span><span class="method-return">: list</span></div>
+      </div>
+    </div>
+
+    <!-- DatabaseManager -->
+    <div class="uml-class cls-db">
+      <div class="class-header">
+        <span class="class-stereotype">«utility»</span>
+        <span class="class-name">DatabaseManager</span>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Attributes</div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">connection</span><span class="attr-type">: MySQL</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">cursor</span><span class="attr-type">: Cursor</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">host</span><span class="attr-type">: str</span></div>
+        <div class="attr"><span class="visibility vis-prv">-</span><span class="attr-name">db_name</span><span class="attr-type">: str</span></div>
+      </div>
+      <div class="class-section">
+        <div class="class-section-label">Methods</div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">connect()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">execute_query()</span><span class="method-return">: result</span></div>
+        <div class="method"><span class="visibility vis-pub">+</span><span class="method-name">close()</span><span class="method-return">: void</span></div>
+        <div class="method"><span class="visibility vis-prv">-</span><span class="attr-name">_handle_error()</span><span class="method-return">: void</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RELATIONSHIPS -->
+  <div class="relationships">
+    <div class="rel-title">🔗 Relationships</div>
+
+    <div class="rel-item">
+      <span class="rel-from">Member</span>
+      <span class="rel-arrow">──────▶</span>
+      <span class="rel-to">Loan</span>
+      <span class="rel-label">borrows (1 to many)</span>
+      <span class="rel-type rt-assoc">Association</span>
+    </div>
+
+    <div class="rel-item">
+      <span class="rel-from">Book</span>
+      <span class="rel-arrow">──────▶</span>
+      <span class="rel-to">Loan</span>
+      <span class="rel-label">issued in (1 to many)</span>
+      <span class="rel-type rt-assoc">Association</span>
+    </div>
+
+    <div class="rel-item">
+      <span class="rel-from">Librarian</span>
+      <span class="rel-arrow">◆─────▶</span>
+      <span class="rel-to">Catalog</span>
+      <span class="rel-label">manages (1 to 1)</span>
+      <span class="rel-type rt-comp">Composition</span>
+    </div>
+
+    <div class="rel-item">
+      <span class="rel-from">Catalog</span>
+      <span class="rel-arrow">◇─────▶</span>
+      <span class="rel-to">Book</span>
+      <span class="rel-label">contains (1 to many)</span>
+      <span class="rel-type rt-agg">Aggregation</span>
+    </div>
+
+    <div class="rel-item">
+      <span class="rel-from">Librarian</span>
+      <span class="rel-arrow">──────▶</span>
+      <span class="rel-to">Loan</span>
+      <span class="rel-label">processes</span>
+      <span class="rel-type rt-dep">Dependency</span>
+    </div>
+
+    <div class="rel-item">
+      <span class="rel-from">DatabaseManager</span>
+      <span class="rel-arrow">──────▶</span>
+      <span class="rel-to">Book / Member / Loan</span>
+      <span class="rel-label">persists all entities</span>
+      <span class="rel-type rt-dep">Dependency</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
